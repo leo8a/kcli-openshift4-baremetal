@@ -7,7 +7,7 @@ PRIMARY_NIC=$(ls -1 /sys/class/net | head -1)
 dnf clean all
 sleep 30
 {% endif %}
-echo "fastestmirror=1" >> /etc/dnf/dnf.conf
+grep -qxF "fastestmirror=1" /etc/dnf/dnf.conf || echo "fastestmirror=1" >> /etc/dnf/dnf.conf
 dnf -y install pkgconf-pkg-config libvirt-devel gcc python3-libvirt python3 git python3-netifaces
 
 dnf -y copr enable karmab/kcli
@@ -25,4 +25,4 @@ sed -i "s/CHANGEME/$IP/" /root/install-config.yaml
 api_vip=$(grep apiVIP /root/install-config.yaml | sed s/apiVIP:// | xargs)
 cluster=$(grep -m 1 name /root/install-config.yaml | awk -F: '{print $2}' | xargs)
 domain=$(grep baseDomain /root/install-config.yaml | awk -F: '{print $2}' | xargs)
-echo $api_vip api.$cluster.$domain >> /etc/hosts
+grep -qxF "${api_vip} api.${cluster}.${domain}" /etc/hosts || echo $api_vip api.$cluster.$domain >> /etc/hosts
